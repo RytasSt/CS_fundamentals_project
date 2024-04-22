@@ -218,7 +218,7 @@ class Enemy:
 
     def attack_castle(self, hp_bar) -> None:
         if self.y >= 490 and hp_bar.hp > 0 and self.visible == True:
-            hp_bar.hp -= 100
+            hp_bar.hp -= 15
             self.visible = False
 
 
