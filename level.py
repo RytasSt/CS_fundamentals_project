@@ -117,9 +117,6 @@ class Castle:
         self.width = width
         self.height = height
         self.scale = scale
-    
-    def draw_char(self, screen) -> None:
-        pygame.draw.rect(screen, (255, 255, 0), (self.x, self.y, self.width, self.height))
 
     def draw_castle(self, screen, sheet):
         tile_3 = sheet.get_image(self.scale, 16, 16, 3, BLACK)
@@ -208,7 +205,7 @@ class Enemy:
 
     def attack_castle(self, hp_bar) -> None:
         if self.y >= 490 and hp_bar.hp > 0 and self.visible == True:
-            hp_bar.hp -= 15
+            hp_bar.hp -= 20
             self.visible = False
 
 
