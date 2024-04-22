@@ -51,7 +51,6 @@ class Level:
                 if self.players_input.active == True:
                     if event.key == pygame.K_BACKSPACE:
                         self.players_input.user_text = self.players_input.user_text[:-1]
-                        self.players_input.box_color = "green"
                     elif len(self.players_input.user_text) < 15:
                         self.players_input.user_text += event.unicode
 
@@ -78,7 +77,7 @@ class Level:
                 random.randint(553, 728),
                 random.randint(808, 984),
                 random.randint(1064, 1200)
-    ]
+            ]
             x = random.choice(lanes)
             enemy_text = f"{random.choices(self.random_words)[0]}"
             enemy = Enemy(x, 0, 1, self.screen, self.sprite_sheet, enemy_text)
@@ -87,12 +86,6 @@ class Level:
 
     def gameplay_loop(self):
         self.screen.fill(BLACK)
-        # for x in range(0, 1280, 256):
-            # pygame.draw.line(screen, "lightgrey", (1, x), (1280, x), 2)
-            # pygame.draw.line(self.screen, "darkorange", (x, 1), (x, 520), 5)
-
-
-        # self.castle.draw_char(self.screen)
         self.castle.draw_castle(self.screen, self.castle_sheet)
         self.hp_bar.draw(self.screen)
 
@@ -117,7 +110,6 @@ class Level:
         self.handle_events()
         
 
-
 class Castle:
     def __init__(self, x: int, y: int, width: int, height: int, scale: int):
         self.x = x
@@ -133,7 +125,6 @@ class Castle:
         tile_3 = sheet.get_image(self.scale, 16, 16, 3, BLACK)
         for i in range(27):
             screen.blit(tile_3, (self.x + (i * 16 * self.scale), self.y))
-
             
 
 class Players_input:
@@ -164,7 +155,6 @@ class Players_input:
 
         return pygame.draw.rect(screen, self.box_color, (self.input_box_x, self.input_box_y, self.input_box_width, 60), 2)
         
-
 
 class Enemy:
     def __init__(self, x: int, y: int, speed: int, screen: Surface, sprite_sheet, enemy_text):
@@ -235,4 +225,3 @@ class Health_bar:
         ratio = self.hp / self.max_hp
         pygame.draw.rect(surface, "red", (self.x, self.y, self.w, self.h))
         pygame.draw.rect(surface, "green", (self.x, self.y, self.w * ratio, self.h))
-        
