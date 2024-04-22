@@ -17,13 +17,23 @@ clock = pygame.time.Clock()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 def main():
-    # r = requests.get('https://random-word-api.vercel.app/api?words=100&length=4')
-    r = requests.get('https://random-word-api.vercel.app/api?words=200')
-    random_words = r.json()
+    while True:
+        try:
+            # r = requests.get('https://random-word-api.vercel.app/api?words=100&length=4')
+            r = requests.get('https://random-word-api.vercel.app/api?words=200')
+            random_words = r.json()
+            words_under_n_letters = []
+            for word in random_words:
+                if len(word) < 12:
+                    words_under_n_letters.append(word)
+            break
+        except requests.exceptions.Timeout:
+            print("Retrying API request...")
+        except Exception as e:
+            raise(e)
 
     game_state_manager = GameStateManager('start_menu')
-
-    level = Level(screen, game_state_manager, random_words)
+    level = Level(screen, game_state_manager, words_under_n_letters)
     start_menu = Start_menu(screen, game_state_manager)
     gameover = Gameover(screen, game_state_manager)
     results = Results(screen, game_state_manager)
