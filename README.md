@@ -5,6 +5,10 @@
 - After starting the game type the words that enemies have on top of them
 - See your score after enemies breach your castle
 
+## pipreqs requirements
+- `pygame==2.5.2`
+- `Requests==2.31.0`
+
 ## Used libraries
 - pygame
 - requests
