@@ -9,7 +9,7 @@ class Start_menu:
         self.gameStateManager = gameStateManager
         self.start_button = Button(300, SCREEN_HEIGHT // 2, 200, 70, display, "Start")
         self.exit_button = Button(600, SCREEN_HEIGHT // 2, 200, 70, display, "Exit")
-        self.results_button = Button(900, SCREEN_HEIGHT // 2, 200, 70, display, "High score")
+        self.scores_button = Button(900, SCREEN_HEIGHT // 2, 200, 70, display, "Scores")
 
     def run_level(self):
         self.screen.fill((0, 0, 0))
@@ -22,8 +22,5 @@ class Start_menu:
         if self.exit_button.draw():
             pygame.quit()
             sys.exit()
-        if self.results_button.draw():
-            print("results")
-
-
-        
+        if self.scores_button.draw():
+            self.gameStateManager.set_state('results')

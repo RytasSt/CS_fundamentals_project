@@ -3,36 +3,38 @@ from pygame.rect import Rect
 from pygame.surface import Surface
 import requests
 
+import os
 import sys
 import time
 import random
 from constants import *
 from sprite_sheet import Sprite_sheet
+import score
 
 class Level:
     def __init__(self, screen, game_state_manager, random_words):
         self.screen = screen
         self.game_state_manager = game_state_manager
         self.clock = pygame.time.Clock()
+        self.score = 0
 
         self.random_words = random_words
         self.base_font = pygame.font.SysFont("bahnschrift", 32, False, False)
-        self.all_fonts = pygame.font.get_fonts()
-        # valid_fonts
-        self.f = random.choice(self.all_fonts)
-        # print(f)
         self.enemy_font = pygame.font.SysFont("arial", 24)
 
+        # Sprites
         self.sprite_sheet_image = pygame.image.load('sprites\enemy.png').convert_alpha()
         self.sprite_sheet = Sprite_sheet(self.sprite_sheet_image)
+        self.castle_sheet_image = pygame.image.load(os.path.join('sprites', 'tiles.png')).convert_alpha()
+        self.castle_sheet = Sprite_sheet(self.castle_sheet_image)
         self.enemy_list = []
         
-        self.castle = Castle(0, 500, 1280, 70)
+        self.castle = Castle(0, 500, 1280, 70, 3)
         self.players_input = Players_input(540, 650, self.screen)
         self.hp_bar = Health_bar(90, 580, 1100, 20, 100)
 
         self.last_enemy_spawn = pygame.time.get_ticks()
-        self.spawn_speed = 5000
+        self.spawn_speed = 4000
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -52,39 +54,30 @@ class Level:
                         self.players_input.box_color = "green"
                     elif len(self.players_input.user_text) < 15:
                         self.players_input.user_text += event.unicode
-            
-            if event.type == pygame.KEYDOWN:
-                if self.players_input.active == True:
+
                     if event.key == pygame.K_RETURN:
-                        # CHECK FOR ENEMY COMBINATIONS
                         self.players_input.user_text = self.players_input.user_text[:-1]
-                        # if self.enemy.enemy_text == self.players_input.user_text:
-                        #     self.enemy.visible = False
                         for enemy in self.enemy_list:
                             if enemy.enemy_text == self.players_input.user_text:
                                 enemy.visible = False
-                        else:
-                            # DO SOMETHING WHEN WRONG ANSWER
-                            pass
+                                self.score += 1
+                                if len(self.enemy_list) > 10:
+                                    self.enemy_list.pop(0)
 
                         self.players_input.user_text = ""
-        
-        
-        # pygame.display.update()
-        # self.clock.tick(60)
 
 
     def create_enemies(self):
         current_time = pygame.time.get_ticks()
         if current_time - self.last_enemy_spawn >= self.spawn_speed:
-            if self.spawn_speed > 1000:
+            if self.spawn_speed > 2000:
                 self.spawn_speed -= 100
             lanes = [
-                random.randint(40, 236),
+                random.randint(80, 236),
                 random.randint(306, 472),
                 random.randint(553, 728),
                 random.randint(808, 984),
-                random.randint(1064, 1240)
+                random.randint(1064, 1200)
     ]
             x = random.choice(lanes)
             enemy_text = f"{random.choices(self.random_words)[0]}"
@@ -94,12 +87,13 @@ class Level:
 
     def gameplay_loop(self):
         self.screen.fill(BLACK)
-        for x in range(0, 1280, 256):
+        # for x in range(0, 1280, 256):
             # pygame.draw.line(screen, "lightgrey", (1, x), (1280, x), 2)
-            pygame.draw.line(self.screen, "darkorange", (x, 1), (x, 520), 5)
+            # pygame.draw.line(self.screen, "darkorange", (x, 1), (x, 520), 5)
 
 
-        self.castle.draw_char(self.screen)
+        # self.castle.draw_char(self.screen)
+        self.castle.draw_castle(self.screen, self.castle_sheet)
         self.hp_bar.draw(self.screen)
 
         self.create_enemies()
@@ -108,10 +102,11 @@ class Level:
             enemy.draw_sprite(enemy_animation_list)
             enemy.move_to_castle()
             enemy.render_enemy_text(self.enemy_font)
-            enemy.attack_castle(1, self.hp_bar)
+            enemy.attack_castle(self.hp_bar)
 
         self.players_input.render_text(self.base_font, self.screen)
         if self.hp_bar.hp <= 0:
+            score.Highscore.save_results(self.score)
             self.game_state_manager.set_state('gameover')
 
         self.clock.tick(FPS)
@@ -124,14 +119,20 @@ class Level:
 
 
 class Castle:
-    def __init__(self, x: int, y: int, width: int, height: int):
+    def __init__(self, x: int, y: int, width: int, height: int, scale: int):
         self.x = x
         self.y = y
         self.width = width
-        self.height = height            
+        self.height = height
+        self.scale = scale
     
     def draw_char(self, screen) -> None:
         pygame.draw.rect(screen, (255, 255, 0), (self.x, self.y, self.width, self.height))
+
+    def draw_castle(self, screen, sheet):
+        tile_3 = sheet.get_image(self.scale, 16, 16, 3, BLACK)
+        for i in range(27):
+            screen.blit(tile_3, (self.x + (i * 16 * self.scale), self.y))
 
             
 
@@ -186,9 +187,7 @@ class Enemy:
     def get_animation_list(self):
         animation_list = []
         animation_steps = 3
-        # self.last_update = pygame.time.get_ticks()
         self.cooldown = 500
-        # self.frame = 0
 
         for n in range(animation_steps):
             animation_list.append(self.sprite_sheet.get_image(n, self.width, self.height, 3, BLACK))
@@ -208,11 +207,6 @@ class Enemy:
         else:
             self.screen.blit(self.frame_death, (self.x, self.y))
 
-            
-    # def death_animation(self):
-    #     self.screen.blit(self.frame_death, (self.x, self.y))
-
-
     def move_to_castle(self) -> None:
         if self.y < 490 and self.visible == True:
             self.y += self.speed 
@@ -222,15 +216,10 @@ class Enemy:
             text_surface = font.render(self.enemy_text, True, WHITE)
             self.screen.blit(text_surface, (self.x - 15, self.y - 25))
 
-    def attack_castle(self, speed: int, hp_bar) -> None:
+    def attack_castle(self, hp_bar) -> None:
         if self.y >= 490 and hp_bar.hp > 0 and self.visible == True:
-            # current_time = pygame.time.get_ticks()
-
-            # if current_time - self.last_attack_time >= 1000:
-            hp_bar.hp -= 10
+            hp_bar.hp -= 100
             self.visible = False
-            # self.last_attack_time = current_time
-
 
 
 class Health_bar:

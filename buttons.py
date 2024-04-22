@@ -11,7 +11,6 @@ class Button:
         self.button_text = button_text
         self.pressed = False
 
-
     def draw(self):
         action = False
 

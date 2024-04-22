@@ -1,9 +1,10 @@
 import pygame
 from constants import *
-from score import Highscore
 from buttons import Button
+import sys
+from score import Highscore
 
-class Gameover:
+class Results:
     def __init__(self, display, gameStateManager):
         self.screen = display
         self.gameStateManager = gameStateManager
@@ -12,16 +13,16 @@ class Gameover:
     def run_level(self):
         self.screen.fill((0, 0, 0))
         font = pygame.font.SysFont(None, 50)
-        text_info = font.render("Your castle has been destroyed!", True, WHITE)
-        highscore = Highscore()
-        highscore.get_last_line()
-        score = highscore.extract_score()
+        text = font.render("Highscore list", True, WHITE)
+        self.screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, 50))
 
-        text_score = font.render(f"Score: {score}", True, WHITE)
-        self.screen.blit(text_info, (SCREEN_WIDTH // 2 - text_info.get_width() // 2, SCREEN_HEIGHT // 2 - text_info.get_height() // 2))
-        self.screen.blit(text_score, (SCREEN_WIDTH // 2 - text_info.get_width() // 2, 50))
+        font_score = pygame.font.SysFont(None, 16)
+        highscore = Highscore()
+        score_list = highscore.get_last_scores(10)
         
+        for i, score in enumerate(score_list):
+            text_score = font_score.render(score[:-1], True, WHITE)
+            self.screen.blit(text_score, (250, 120 + (i * 50)))
+
         if self.back_button.draw():
             self.gameStateManager.set_state('start_menu')
-
-        
