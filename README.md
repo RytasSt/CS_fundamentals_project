@@ -3,6 +3,7 @@
 - `python main.py` to launch the program
 - Program has GUI for navigation
 - After starting the game type the words that enemies have on top of them
+- See your score after enemies breach your castle
 
 ## Used libraries
 - pygame
