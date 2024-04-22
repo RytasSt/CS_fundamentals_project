@@ -2,6 +2,7 @@ import pygame
 from constants import *
 
 class Button:
+    """Represents a button."""
     def __init__(self, x, y, width, height, screen, button_text):
         self.x = x
         self.y = y
@@ -12,6 +13,7 @@ class Button:
         self.pressed = False
 
     def draw(self):
+        """Draws a button and returns 'True' if it is pressed."""
         action = False
 
         font = pygame.font.SysFont(None, 52)

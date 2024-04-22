@@ -4,6 +4,7 @@ from buttons import Button
 import sys
 
 class Start_menu:
+    """Represents start menu state/screen."""
     def __init__(self, display, gameStateManager):
         self.screen = display
         self.gameStateManager = gameStateManager
@@ -12,6 +13,7 @@ class Start_menu:
         self.scores_button = Button(900, SCREEN_HEIGHT // 2, 200, 70, display, "Scores")
 
     def run_level(self):
+        """Starts off the state."""
         self.screen.fill((0, 0, 0))
         font = pygame.font.SysFont(None, 50)
         text = font.render("Main menu", True, (255, 255, 255))

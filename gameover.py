@@ -4,12 +4,14 @@ from score import Highscore
 from buttons import Button
 
 class Gameover:
+    """Represents gameover state/screen."""
     def __init__(self, display, gameStateManager):
         self.screen = display
         self.gameStateManager = gameStateManager
         self.back_button = Button(SCREEN_WIDTH // 2, 600, 200, 70, display, "Back")
 
     def run_level(self):
+        """Starts off the state."""
         self.screen.fill((0, 0, 0))
         font = pygame.font.SysFont(None, 50)
         text_info = font.render("Your castle has been destroyed!", True, WHITE)

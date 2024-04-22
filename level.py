@@ -12,7 +12,9 @@ from sprite_sheet import Sprite_sheet
 import score
 
 class Level:
+    """Represents level state/screen."""
     def __init__(self, screen, game_state_manager, random_words):
+        """Initializes environment for game."""
         self.screen = screen
         self.game_state_manager = game_state_manager
         self.clock = pygame.time.Clock()
@@ -37,6 +39,7 @@ class Level:
         self.spawn_speed = 4000
 
     def handle_events(self):
+        """Handles all of level pygame events."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
@@ -67,6 +70,7 @@ class Level:
 
 
     def create_enemies(self):
+        """Creates enemy at the start of a random lane."""
         current_time = pygame.time.get_ticks()
         if current_time - self.last_enemy_spawn >= self.spawn_speed:
             if self.spawn_speed > 2000:
@@ -85,6 +89,7 @@ class Level:
             self.last_enemy_spawn = current_time
 
     def gameplay_loop(self):
+        """Level gameplay loop."""
         self.screen.fill(BLACK)
         self.castle.draw_castle(self.screen, self.castle_sheet)
         self.hp_bar.draw(self.screen)
@@ -104,13 +109,14 @@ class Level:
 
         self.clock.tick(FPS)
         
-    # RUN LEVEL 
     def run_level(self):
+        """Starts off the state."""
         self.gameplay_loop()
         self.handle_events()
         
 
 class Castle:
+    """Represents a castle for the enemies to attack."""
     def __init__(self, x: int, y: int, width: int, height: int, scale: int):
         self.x = x
         self.y = y
@@ -119,12 +125,14 @@ class Castle:
         self.scale = scale
 
     def draw_castle(self, screen, sheet):
+        """Gets loaded image and draws multiple of them on screen in a line."""
         tile_3 = sheet.get_image(self.scale, 16, 16, 3, BLACK)
         for i in range(27):
             screen.blit(tile_3, (self.x + (i * 16 * self.scale), self.y))
             
 
 class Players_input:
+    """Handles input box logic."""
     def __init__(self, input_box_x: int, input_box_y: int, screen):
         self.user_text = ""
         self.input_box_x = input_box_x
@@ -134,6 +142,7 @@ class Players_input:
         self.box_color = ""
 
     def render_text(self, font, screen) -> Rect:
+        """Renders typed text on input box."""
         text_surface = font.render(self.user_text, True, WHITE)
         text_width = text_surface.get_width()
 
@@ -154,6 +163,7 @@ class Players_input:
         
 
 class Enemy:
+    """Represents an enemy in the game."""
     def __init__(self, x: int, y: int, speed: int, screen: Surface, sprite_sheet, enemy_text):
         self.x = x
         self.y = y
@@ -172,6 +182,7 @@ class Enemy:
 
 
     def get_animation_list(self):
+        """Gets and returns frames for enemy walking animation."""
         animation_list = []
         animation_steps = 3
         self.cooldown = 500
@@ -182,6 +193,7 @@ class Enemy:
         return animation_list
 
     def draw_sprite(self, animation_list):
+        """Draws enemy on a screen with walking animation. Cooldown is the time between animation frames."""
         current_time = pygame.time.get_ticks()
         if current_time - self.last_update >= self.cooldown:
             self.frame += 1
@@ -195,21 +207,25 @@ class Enemy:
             self.screen.blit(self.frame_death, (self.x, self.y))
 
     def move_to_castle(self) -> None:
+        """Moves towards the castle until reaching it."""
         if self.y < 490 and self.visible == True:
             self.y += self.speed 
 
     def render_enemy_text(self, font) -> None:
+        """Renders the text of the enemies."""
         if self.visible:
             text_surface = font.render(self.enemy_text, True, WHITE)
             self.screen.blit(text_surface, (self.x - 15, self.y - 25))
 
     def attack_castle(self, hp_bar) -> None:
+        """Deals damage to castle upon reaching it."""
         if self.y >= 490 and hp_bar.hp > 0 and self.visible == True:
             hp_bar.hp -= 20
             self.visible = False
 
 
 class Health_bar:
+    """Represents a health bar."""
     def __init__(self, x: int, y: int, w: int, h: int, max_hp: int):
         self.x = x
         self.y = y
@@ -219,6 +235,7 @@ class Health_bar:
         self.max_hp = max_hp
 
     def draw(self, surface: Surface) -> None:
+        """Draws a health bar which dynamically updates"""
         ratio = self.hp / self.max_hp
         pygame.draw.rect(surface, "red", (self.x, self.y, self.w, self.h))
         pygame.draw.rect(surface, "green", (self.x, self.y, self.w * ratio, self.h))
