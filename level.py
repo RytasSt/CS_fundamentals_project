@@ -19,24 +19,28 @@ class Level:
         self.game_state_manager = game_state_manager
         self.clock = pygame.time.Clock()
         self.score = 0
-
         self.random_words = random_words
+        self._load_fonts()
+        self._load_sprites()
+        self._initialize_objects()
+        self.last_enemy_spawn = pygame.time.get_ticks()
+        self.spawn_speed = 4000
+
+    def _load_fonts(self):
         self.base_font = pygame.font.SysFont("bahnschrift", 32, False, False)
         self.enemy_font = pygame.font.SysFont("arial", 24)
 
-        # Sprites
+    def _load_sprites(self):
         self.sprite_sheet_image = pygame.image.load('sprites\enemy.png').convert_alpha()
         self.sprite_sheet = Sprite_sheet(self.sprite_sheet_image)
         self.castle_sheet_image = pygame.image.load(os.path.join('sprites', 'tiles.png')).convert_alpha()
         self.castle_sheet = Sprite_sheet(self.castle_sheet_image)
         self.enemy_list = []
-        
+
+    def _initialize_objects(self):
         self.castle = Castle(0, 500, 1280, 70, 3)
         self.players_input = Players_input(540, 650, self.screen)
         self.hp_bar = Health_bar(90, 580, 1100, 20, 100)
-
-        self.last_enemy_spawn = pygame.time.get_ticks()
-        self.spawn_speed = 4000
 
     def handle_events(self):
         """Handles all of level pygame events."""

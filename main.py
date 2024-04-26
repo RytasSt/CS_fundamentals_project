@@ -19,7 +19,6 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 def main():
     while True:
         try:
-            # r = requests.get('https://random-word-api.vercel.app/api?words=100&length=4')
             r = requests.get('https://random-word-api.vercel.app/api?words=200')
             random_words = r.json()
             words_under_n_letters = []
